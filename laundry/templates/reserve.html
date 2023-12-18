@@ -43,9 +43,9 @@
         <p>Brak rezerwacji na wybraną datę.</p>
     {% endif %}
 
-    <a href="{% url 'laundry:show_schedule_by_day' 'poniedziałek' %}">Pokaż rezerwacje na poniedziałek</a>
-    <a href="{% url 'laundry:show_schedule_by_day' 'wtorek' %}">Pokaż rezerwacje na wtorek</a>    
+    
     <br>
     <a href="{% url 'laundry:schedule' %}">Zobacz swoje rezerwacje</a>
 </body>
 </html>
+{% include 'calendar.html'%}

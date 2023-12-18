@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Calendar</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e6e6e6;
+            margin: 20px;
+        }
+
+        .calendar {
+            width: 80%;
+            max-width: 600px; /* Ogranicz maksymalną szerokość, aby uniknąć zbyt dużego rozciągnięcia na dużych ekranach */
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            background-color: #ff6666;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 24px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            padding: 15px;
+        }
+
+        .day {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            display: inline-block;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .day:hover {
+            background-color: #ff6666;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            <span id="prevMonth">&#9664;</span>
+            <span id="currentMonth">December 2023</span>
+            <span id="nextMonth">&#9654;</span>
+        </div>
+        <div class="calendar-body" id="calendarBody">
+            {% for day in calendar_days %}
+                <div class="day">{{ day }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // Tutaj dodaj skrypty obsługujące przyciski zmiany miesiąca
+    </script>
+</body>
+</html>

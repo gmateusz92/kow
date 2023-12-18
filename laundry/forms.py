@@ -18,14 +18,5 @@ class DateForm(forms.Form):
 
 
 
-class DayOfWeekForm(forms.Form):
-    day_of_week = forms.ChoiceField(choices=[
-        ('poniedziałek', 'Poniedziałek'),
-        ('wtorek', 'Wtorek'),
-        ('środa', 'Środa'),
-        ('czwartek', 'Czwartek'),
-        ('piątek', 'Piątek'),
-        ('sobota', 'Sobota'),
-        ('niedziela', 'Niedziela'),
-    ])
+
             

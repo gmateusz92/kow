@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="reserveSlot.js" defer></script>
+    <title>HTML Calendar</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+
+        .calendar {
+            width: 300px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .calendar-header {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .calendar-body {
+            padding: 10px;
+        }
+
+        .day {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            display: inline-block;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .day:hover {
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .hours-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .hour {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            <span id="prevMonth">&#9664;</span>
+            <span id="currentMonth">December 2023</span>
+            <span id="nextMonth">&#9654;</span>
+        </div>
+        <div class="calendar-body" id="calendarBody"></div>
+    </div>
+
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarBody = document.getElementById('calendarBody');
+            const currentMonthElement = document.getElementById('currentMonth');
+            const hoursContainer = document.createElement('div');
+            hoursContainer.className = 'hours-container';
+            document.body.appendChild(hoursContainer);
+
+            function generateCalendar(year, month) {
+                calendarBody.innerHTML = '';
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'day';
+                    calendarBody.appendChild(emptyDay);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'day';
+                    dayElement.textContent = day;
+                    dayElement.addEventListener('click', function() {
+                        handleDayClick(day, month, year);
+                    });
+                    calendarBody.appendChild(dayElement);
+                }
+
+                currentMonthElement.textContent = new Date(year, month, 1).toLocaleDateString('en-us', { month: 'long', year: 'numeric' });
+            }
+
+            function handleDayClick(day, month, year) {
+                const selectedDate = new Date(year, month, day);
+                const formattedDate = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                // Przekieruj użytkownika na stronę z wybranym dniem
+                window.location.href = `/show_selected_day/?date=${encodeURIComponent(formattedDate)}`;
+            }
+
+            let currentYear = new Date().getFullYear();
+            let currentMonth = new Date().getMonth();
+
+            generateCalendar(currentYear, currentMonth);
+
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentYear, currentMonth);
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentYear, currentMonth);
+            });
+
+           
+
+        });
+    </script>
+
+    
+    </script>
+</body>
+</html>

@@ -39,42 +39,60 @@ def show_schedule(request):
     return render(request, 'schedule.html', {'form': form, 'schedule': schedule, 'selected_date': selected_date})
 
 # main/views.py
+def show_selected_day(request):
+    date_str = request.GET.get('date', '') # np http://localhost:8000/show_selected_day/?date=December%201%2C%202023
+    
+    # Przekształć datę ze stringa na obiekt datetime
+    date = datetime.strptime(date_str, '%B %d, %Y')
+    
+    day_of_week = date.weekday()
+    days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+    current_day = days[day_of_week]
+    if request.method == 'POST':
+        form = DateForm(request.POST)
+        if form.is_valid():
+            selected_date = form.cleaned_data['date']
+            # Pobierz rezerwacje dla wybranej daty
+            schedule = get_schedule_for_date(date)
+    else:
+        form = DateForm()
+        selected_date = datetime.today().date()  # Domyślnie pokazuj dzisiejsze rezerwacje
+        schedule = get_schedule_for_date(date)
+
+    context = {'current_day': current_day,
+               'form': form,
+               'schedule': schedule,
+               'selected_date': selected_date
+
+               }
+    return render(request, 'show_selected_day.html', context)
+
 from django.shortcuts import render
+from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Reservation
-from .forms import DateForm
-from .utils import get_schedule_for_date
+from calendar import monthrange
 
-def show_schedule_by_day(request, day_of_week):
-    # Mapowanie nazw dni tygodnia na ich numer (poniedziałek: 0, wtorek: 1, ..., niedziela: 6)
-    days_mapping = {
-        'poniedziałek': 0,
-        'wtorek': 1,
-        'środa': 2,
-        'czwartek': 3,
-        'piątek': 4,
-        'sobota': 5,
-        'niedziela': 6,
-    }
+def show_calendar(request, year=None, month=None):
+    if year is None or month is None:
+        today = datetime.today()
+        year, month = today.year, today.month
+    else:
+        year, month = int(year), int(month)
 
-    # Sprawdź, czy podany dzień tygodnia istnieje w słowniku
-    if day_of_week.lower() not in days_mapping:
-        return render(request, 'invalid_day.html')
+    calendar_days = [i for i in range(1, monthrange(year, month)[1] + 1)]
+    current_month_name = datetime(year, month, 1).strftime('%B')
+    
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year - 1 if month == 1 else year
+    next_month = month + 1 if month < 12 else 1
+    next_year = year + 1 if month == 12 else year
 
-    # Przekształć nazwę dnia tygodnia na numer
-    day_number = days_mapping[day_of_week.lower()]
-
-    # Oblicz datę dla danego dnia tygodnia
-    today = datetime.today()
-    selected_date = today - timedelta(days=today.weekday()) + timedelta(days=day_number)
-    schedule = get_schedule_for_date(selected_date)
-
-    return render(request, 'schedule_by_day.html', {'selected_date': selected_date, 'schedule': schedule})
-
-
-from django.shortcuts import render
-
-def my_view(request):
-    # ... inne elementy kontekstu ...
-    days_of_week = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']
-    return render(request, 'schedule_with_datepicker.html', {'days_of_week': days_of_week})
+    return render(request, 'newcalendar.html', {
+        'calendar_days': calendar_days,
+        'current_month_name': current_month_name,
+        'current_year': year,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+    })
