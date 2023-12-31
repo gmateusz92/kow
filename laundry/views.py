@@ -21,7 +21,7 @@ def reserve_laundry(request):
 
     return render(request, 'reserve.html', {'form': form})
 
-def show_schedule(request):
+def show_today(request):
     selected_date = None
     schedule = None
 
@@ -67,32 +67,74 @@ def show_selected_day(request):
                }
     return render(request, 'show_selected_day.html', context)
 
-from django.shortcuts import render
-from django.urls import reverse
-from datetime import datetime, timedelta
-from calendar import monthrange
+from .models import Reservation  # Importuj model rezerwacji
 
-def show_calendar(request, year=None, month=None):
-    if year is None or month is None:
-        today = datetime.today()
-        year, month = today.year, today.month
-    else:
-        year, month = int(year), int(month)
+def get_reservations_for_date(selected_date):
+    reservations = Reservation.objects.filter(date=selected_date)
+    return reservations
 
-    calendar_days = [i for i in range(1, monthrange(year, month)[1] + 1)]
-    current_month_name = datetime(year, month, 1).strftime('%B')
-    
-    prev_month = month - 1 if month > 1 else 12
-    prev_year = year - 1 if month == 1 else year
-    next_month = month + 1 if month < 12 else 1
-    next_year = year + 1 if month == 12 else year
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 
-    return render(request, 'newcalendar.html', {
-        'calendar_days': calendar_days,
-        'current_month_name': current_month_name,
-        'current_year': year,
-        'prev_year': prev_year,
-        'prev_month': prev_month,
-        'next_year': next_year,
-        'next_month': next_month,
-    })
+@method_decorator(csrf_protect, name='dispatch')
+class ShowSelectedDayView(View):
+    template_name = 'show_selected_dayy.html'
+
+    def get(self, request, *args, **kwargs):
+        date_str = request.GET.get('date', '')
+        
+        # Przekształć datę ze stringa na obiekt datetime
+        date = datetime.today().date()  # Domyślnie dzisiejsza data
+        if date_str:
+            try:
+                date = datetime.strptime(date_str, '%B %d, %Y')
+            except ValueError:
+                # Dodaj obsługę błędu, na przykład przypisz dzisiejszą datę
+                pass
+        
+        day_of_week = date.weekday()
+        days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+        current_day = days[day_of_week]
+        
+        form = DateForm()
+        schedule = get_schedule_for_date(date)
+        reservation_form = ReservationForm()
+        reservations = get_reservations_for_date(date)
+        
+        return render(request, self.template_name, {
+            'form': form,
+            'current_day': current_day,
+            'schedule': schedule,
+            'selected_date': date,
+            'reservation_form': reservation_form,
+            'reservations': reservations
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = DateForm(request.POST)
+        if form.is_valid():
+            selected_date = form.cleaned_data['date']
+            schedule = get_schedule_for_date(selected_date)
+            
+            # Popraw: Przekazuj dane z żądania do formularza rezerwacji
+            reservation_form = ReservationForm(request.POST)
+            
+            if reservation_form.is_valid():
+                # Popraw: Zapisz rezerwację tylko jeśli formularz rezerwacji jest prawidłowy
+                reservation = reservation_form.save(commit=False)
+                reservation.user = request.user
+                reservation.date = selected_date
+                reservation.save()
+                return redirect('laundry:show_selected_dayy')
+                
+            reservations = get_reservations_for_date(selected_date)
+            return render(request, self.template_name, {
+                'form': form,
+                'current_day': selected_date.strftime('%A'),
+                'schedule': schedule,
+                'selected_date': selected_date,
+                'reservation_form': reservation_form,
+                'reservations': reservations
+            })
+        return render(request, self.template_name, {'form': form})

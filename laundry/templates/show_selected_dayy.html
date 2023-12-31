@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+<h2>Twoje rezerwacje na dzień {{ current_day}}</h2>
+{% if schedule %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Godzina</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hour, status in schedule.items %}
+                <tr>
+                    <td>{{ hour }}</td>
+                    <td>{{ status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Brak rezerwacji na wybraną datę.</p>
+{% endif %}
+
+
+
+
+
+<!-- Formularz do nowej rezerwacji -->
+<form method="post" action="{% url 'laundry:show_selected_dayy' %}">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ reservation_form.as_p }}
+    <input type="submit" value="Zarezerwuj">
+</form>
+
+{% endblock %}

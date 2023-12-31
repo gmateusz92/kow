@@ -1,5 +1,5 @@
-
-
+{% extends "base.html" %}
+{% block content %}
 
 <h2>Twoje rezerwacje na dzień {{ current_day}}</h2>
 {% if schedule %}
@@ -22,3 +22,18 @@
 {% else %}
     <p>Brak rezerwacji na wybraną datę.</p>
 {% endif %}
+
+{{ form.media}}
+
+<body>
+    <h2>Rezerwacja prania</h2>
+    <form method="post" action="{% url 'laundry:reserve_laundry' %}">
+        {% csrf_token %}
+        {{ form.media}}
+        {{ form.as_p }}
+       
+        <button type="submit">Dokonaj rezerwacji</button>
+    </form>
+</body>   
+
+{% endblock %}

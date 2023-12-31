@@ -12,6 +12,12 @@
             margin: 20px;
         }
 
+        .calendar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .calendar {
             width: 300px;
             margin: 0 auto;
@@ -119,7 +125,7 @@
                 const formattedDate = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
                 // Przekieruj użytkownika na stronę z wybranym dniem
-                window.location.href = `/show_selected_day/?date=${encodeURIComponent(formattedDate)}`;
+                window.location.href = `/show_selected_dayy/?date=${encodeURIComponent(formattedDate)}`;
             }
 
             let currentYear = new Date().getFullYear();

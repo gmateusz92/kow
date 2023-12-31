@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include 'calendar.html'%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,41 +15,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 </head>
 
-<body>
-    <h2>Rezerwacja prania</h2>
-    <form method="post" action="{% url 'laundry:reserve_laundry' %}">
-        {% csrf_token %}
-        {{ form.media}}
-        {{ form.as_p }}
-        <button type="submit">Dokonaj rezerwacji</button>
-    </form>
+
     
-    
-    <h2>Twoje rezerwacje</h2>
-    {% if schedule %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Godzina</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for hour, status in schedule.items %}
-                    <tr>
-                        <td>{{ hour }}</td>
-                        <td>{{ status }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Brak rezerwacji na wybraną datę.</p>
-    {% endif %}
+  
 
     
     <br>
-    <a href="{% url 'laundry:schedule' %}">Zobacz swoje rezerwacje</a>
-</body>
+    <a href="{% url 'laundry:show_today' %}">Zobacz rezerwacje na dziś</a>
+
 </html>
-{% include 'calendar.html'%}
+
+
+
+<style>
+    /* Dodaj niestandardowe style dla formularza */
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Dodaj niestandardowe style dla przycisku rezerwacji */
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+
+{% endblock %}
